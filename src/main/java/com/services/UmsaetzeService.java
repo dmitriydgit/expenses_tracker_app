@@ -1,6 +1,5 @@
 package com.services;
 
-import com.clients.UmsaetzeClient;
 import com.models.Umsatz;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

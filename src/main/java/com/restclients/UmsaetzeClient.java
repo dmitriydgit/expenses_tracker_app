@@ -1,4 +1,4 @@
-package com.clients;
+package com.restclients;
 
 import io.vertx.mutiny.pgclient.PgPool;
 import jakarta.inject.Inject;

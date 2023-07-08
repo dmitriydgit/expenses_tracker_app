@@ -1,4 +1,4 @@
-package com.main;
+package com.restresources;
 
 import com.models.Umsatz;
 import com.services.UmsaetzeService;
