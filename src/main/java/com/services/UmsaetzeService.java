@@ -17,14 +17,10 @@ public class UmsaetzeService {
   @Inject
   PgPool client;
 
-//  @Inject
-//  @RestClient
-//  UmsaetzeClient umsetzClient;
-//
 
 
   public Multi<Umsatz> findAll(PgPool client){
-    return client.query("SELECT id, anbieter FROM umsaetze ORDER BY anbieter DESC").execute()
+    return client.query("SELECT id, anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar FROM umsaetze ORDER BY id ASC").execute()
         .onItem()
         .transformToMulti(set -> Multi.createFrom().iterable(set))
         .onItem()
@@ -32,7 +28,7 @@ public class UmsaetzeService {
   }
 
   public Uni<Umsatz> findById(PgPool client, Long id){
-    return client.preparedQuery("SELECT id, anbieter FROM umsaetze WHERE id = $1").execute(Tuple.of(id))
+    return client.preparedQuery("SELECT id, anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar FROM umsaetze WHERE id = $1").execute(Tuple.of(id))
         .onItem()
         .transform(m-> m.iterator().hasNext() ? from(m.iterator().next()): null);
 
@@ -48,6 +44,17 @@ public class UmsaetzeService {
         .transform(m -> m.iterator().next().getLong("id"));
   }
 
+  public Uni<Umsatz> update(PgPool client, Long id, Umsatz objectToUpdate){
+    //    String newAnbieter = objectToUpdate.getAnbieter();
+
+    return client
+        .preparedQuery("UPDATE umsaetze SET anbieter = $2 WHERE id=$1")
+        .execute(Tuple.of(id, objectToUpdate.getAnbieter()))
+        .invoke(tempRes -> System.out.println(tempRes.toString()))
+        .onItem()
+        .transform(m -> m.iterator().hasNext() ? from(m.iterator().next()) : null);
+  }
+
   public Uni<Boolean> delete(PgPool client, Long id){
     return client
         .preparedQuery("DELETE FROM umsaetze WHERE id = $1")
@@ -57,7 +64,7 @@ public class UmsaetzeService {
   }
 
   private static Umsatz from (Row row){
-    return new Umsatz(row.getLong("id"), row.getString("anbieter"));
+    return new Umsatz(row.getLong("id"), row.getString("anbieter"), row.getString("abbuchungskonto"), row.getString("buchungszeit"), row.getString("beitrag"), row.getString("typ"), row.getString("kategorie"), row.getString("umsatzart"),  row.getString("kommentar"));
   }
 
 

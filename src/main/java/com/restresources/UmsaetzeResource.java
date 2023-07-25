@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -46,38 +47,48 @@ public class UmsaetzeResource {
   @GET
   @Path("{id}")
   public Uni<Response> get(@PathParam("id") Long id) {
-    return businessService.findById(client, id)
+    return businessService
+        .findById(client, id)
         .onItem()
-        .transform(umsatz ->
-            umsatz != null ?
-                Response.ok(umsatz) :
-            Response.status(Status.NOT_FOUND))
+        .transform(
+            umsatz -> umsatz != null ? Response.ok(umsatz) : Response.status(Status.NOT_FOUND))
         .onItem()
         .transform(Response.ResponseBuilder::build);
   }
 
   @POST
-  public Uni<Response> create(Umsatz umsatz){
+  public Uni<Response> create(Umsatz umsatz) {
     return businessService
         .save(client, umsatz.getAnbieter())
         .onItem()
-        .transform(id -> URI.create("/umsaetze/" + id ))
+        .transform(id -> URI.create("/umsaetze/" + id))
         .onItem()
         .transform(uri -> Response.created(uri).build());
   }
 
+  @PUT
+  @Path("/{id}")
+  public Uni<Response> update(@PathParam("id") Long id, Umsatz objectToUpdate) {
+    return businessService
+        .update(client, id, objectToUpdate)
+        .invoke(test -> System.out.println(test))
+        .onItem()
+        .transform(
+            umsatz -> umsatz != null ? Response.ok(umsatz) : Response.status(Status.NOT_FOUND))
+        .onItem()
+        .transform(Response.ResponseBuilder::build);
+  }
+
   @DELETE
   @Path("{id}")
-  public Uni<Response> delete(@PathParam("id") Long id){
+  public Uni<Response> delete(@PathParam("id") Long id) {
     return businessService
         .delete(client, id)
         .onItem()
-        .transform(deleted -> deleted ?  Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
+        .transform(deleted -> deleted ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
         .onItem()
         .transform(status -> Response.status(status).build());
-      }
-
-
+  }
 
   private void initdb() {
     client
@@ -86,13 +97,42 @@ public class UmsaetzeResource {
         .flatMap(
             m ->
                 client
-                    .query("CREATE TABLE umsaetze (id SERIAL PRIMARY KEY, anbieter TEXT NOT NULL)")
+                    .query(
+                        "CREATE TABLE umsaetze ("
+                            + "id SERIAL PRIMARY KEY, "
+                            + "anbieter TEXT NOT NULL, "
+                            + "abbuchungskonto TEXT NOT NULL, "
+                            + "buchungszeit TEXT NOT NULL, "
+                            + "beitrag TEXT NOT NULL, "
+                            + "typ TEXT NOT NULL, "
+                            + "kategorie TEXT NOT NULL, "
+                            + "umsatzart TEXT NOT NULL, "
+                            + "kommentar TEXT NOT NULL)")
                     .execute())
-        //        .flatMap(m -> client.query("INSERT INTO umsaetze (buchungszeit , abbuchungskonto,
-        // beitrag, anbieter, typ, kategorie, umsatzart, kommentar) VALUES (Buchungszeit ,
-        // Abbuchungskonto, Beitrag, Anbieter, Typ, Kategorie, Umsatzart, Kommentar)").execute())
-        .flatMap(m -> client.query("INSERT INTO umsaetze (anbieter) VALUES ('Kaufland')").execute())
-        .flatMap(m -> client.query("INSERT INTO umsaetze (anbieter) VALUES ('Lidl')").execute())
+        .flatMap(
+            m ->
+                client
+                    .query(
+                        "INSERT INTO umsaetze (anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar) VALUES ('Kaufland', '111222333444', '12:05:20 Uhr','15.35 Euro', 'aufwaende', 'shopping', 'kartenzahlung','')")
+                    .execute())
+        .flatMap(
+            m ->
+                client
+                    .query(
+                        "INSERT INTO umsaetze (anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar) VALUES ('Aldi', '111222333444', '12:25:30 Uhr','18.35 Euro', 'aufwaende', 'shopping', 'kartenzahlung','')")
+                    .execute())
+        .flatMap(
+            m ->
+                client
+                    .query(
+                        "INSERT INTO umsaetze (anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar) VALUES ('Wasgau', '111222333444', '12:35:50 Uhr','28.35 Euro', 'aufwaende', 'shopping', 'kartenzahlung','')")
+                    .execute())
+        .flatMap(
+            m ->
+                client
+                    .query(
+                        "INSERT INTO umsaetze (anbieter, abbuchungskonto,buchungszeit, beitrag ,typ,kategorie,umsatzart,kommentar) VALUES ('Rewo', '111222333444', '12:45:30 Uhr','8.35 Euro', 'aufwaende', 'shopping', 'kartenzahlung','')")
+                    .execute())
         .await()
         .indefinitely();
   }

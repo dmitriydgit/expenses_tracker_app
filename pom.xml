@@ -38,6 +38,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
 
 
@@ -91,6 +92,18 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-jsonb</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-hibernate-orm-panache -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-orm-panache</artifactId>
+            <version>3.2.0.Final</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-jdbc-postgresql -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
+            <version>3.2.0.Final</version>
         </dependency>
 
 
